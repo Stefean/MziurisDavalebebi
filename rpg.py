@@ -1,3 +1,9 @@
+
+def log_action(func):
+    def wrapper(self, *args ,**kwargs):
+        print(f"{self.name} -> {func.__name__}")
+        return func(self, *args, **kwargs)
+    return wrapper
 class Character: 
     count = 0
     def __init__(self, name, hp=100, level=1):
@@ -13,7 +19,8 @@ class Character:
         self.hp = self.hp - amount
         if self.hp < 0:
             self.hp = 0
-
+    
+    @log_action
     def attack(self, target):
         target.take_damage(5)
 
@@ -21,7 +28,7 @@ class Character:
     def from_string(cls, char_str):
         parts = char_str.strip().split(";")
         if len(parts) == 2:
-            return Warrior(parts[0], int(parts[1]))
+            return cls(parts[0], int(parts[1]))
         return False
 
     @staticmethod
@@ -43,6 +50,7 @@ class Warrior(Character):
         super().__init__(name, hp, level)
         self.strength = strength
 
+    @log_action
     def attack(self, target):
         target.take_damage(self.strength)
 
@@ -50,7 +58,7 @@ class Mage(Character):
     def __init__(self, name, hp=100, level=1, mana=50):
         super().__init__(name, hp, level)
         self.mana = mana
-
+    @log_action
     def attack(self, target):
         if self.mana < 10:
             super().attack(target)
@@ -63,7 +71,31 @@ class Mage(Character):
         parent_str = super().__str__()
         return f"{parent_str} MP {self.mana}"
 
+class Inventory:
+    def __init__(self):
+        self.inventory = []
+
+    def add(self, **kwargs):
+        self.inventory.append(kwargs)
+
+    def find(self, **kwargs):
+        result = {}
+        for item in self.inventory:
+            match = True
+            for key, value in kwargs.items():
+                if item.get(key) != value:
+                    match = False 
+                    break
+            if match:
+                result[key] = value
+        return result
+
+    def __len__(self):
+        return len(self.inventory)
+                           
+
 class HealerMixin:
+    @log_action
     def heal(self, target, amount):
         target.hp += int(amount)
 
@@ -90,11 +122,23 @@ class Priest(HealerMixin, Mage):
 # n.attack(t)   # mana არ ჰყოფნის: 5 ზიანი
 # print(t)    # Tariel (Lv 1, HP 95)
 
-p = Priest("Nestan", hp=60)
-w = Warrior.from_string("Tariel;120")
+# p = Priest("Nestan", hp=60)
+# w = Warrior.from_string("Tariel;120")
 
 # p.heal(w, 30)
 # print(w)                                   # Tariel (Lv 1, HP 150)
 # print(type(w).__name__)                    # Warrior
 # print(Character.is_valid_name("T"))        # False
 # print(Character("A") == Character("A"))    # True
+
+inv = Inventory()
+inv.add(name="sword", kind="weapon", power=10)
+inv.add(name="potion", kind="heal", power=30)
+
+print(len(inv))                  # 2
+print(inv.find(kind="weapon"))   # [{'name': 'sword', 'kind': 'weapon', 'power': 10}]
+print(inv.find(kind="heal", power=30))   # [{'name': 'potion', 'kind': 'heal', 'power': 30}]
+
+t = Warrior("Tariel")
+n = Mage("Nestan")
+t.attack(n)                      # Tariel → attack
