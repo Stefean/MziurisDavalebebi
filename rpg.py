@@ -159,5 +159,5 @@ def battle(char1, char2):
 # n = Mage("Nestan")
 # t.attack(n)                      # Tariel → attack
 
-winner = battle(Warrior("Tariel", hp=120), Mage("Nestan", hp=80))
-print(f"გამარჯვებული: {winner.name}")
+# winner = battle(Warrior("Tariel", hp=120), Mage("Nestan", hp=80))
+# print(f"გამარჯვებული: {winner.name}")
