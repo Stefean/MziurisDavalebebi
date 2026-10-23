@@ -103,6 +103,22 @@ class Priest(HealerMixin, Mage):
     def __init__(self, name, hp=100, level=1, mana=50):
         super().__init__(name, hp, level, mana)
 
+def battle(char1, char2):
+    if not isinstance(char1, Character) and not isinstance(char2, Character):
+        raise TypeError("Both character should be 'Character' object!!!")
+    winner = None
+    while True:
+        char1.attack(char2)
+        char2.attack(char1)
+        if char1.hp == 0    :
+            winner = char2
+            break
+        elif char2.hp == 0:
+            winner = char1
+            break
+    return winner
+        
+
 # a = Character("Tariel")
 # b = Character("Avtandil", hp=50)
 # b.take_damage(70)
@@ -131,14 +147,17 @@ class Priest(HealerMixin, Mage):
 # print(Character.is_valid_name("T"))        # False
 # print(Character("A") == Character("A"))    # True
 
-inv = Inventory()
-inv.add(name="sword", kind="weapon", power=10)
-inv.add(name="potion", kind="heal", power=30)
+# inv = Inventory()
+# inv.add(name="sword", kind="weapon", power=10)
+# inv.add(name="potion", kind="heal", power=30)
 
-print(len(inv))                  # 2
-print(inv.find(kind="weapon"))   # [{'name': 'sword', 'kind': 'weapon', 'power': 10}]
-print(inv.find(kind="heal", power=30))   # [{'name': 'potion', 'kind': 'heal', 'power': 30}]
+# print(len(inv))                  # 2
+# print(inv.find(kind="weapon"))   # [{'name': 'sword', 'kind': 'weapon', 'power': 10}]
+# print(inv.find(kind="heal", power=30))   # [{'name': 'potion', 'kind': 'heal', 'power': 30}]
 
-t = Warrior("Tariel")
-n = Mage("Nestan")
-t.attack(n)                      # Tariel → attack
+# t = Warrior("Tariel")
+# n = Mage("Nestan")
+# t.attack(n)                      # Tariel → attack
+
+winner = battle(Warrior("Tariel", hp=120), Mage("Nestan", hp=80))
+print(f"გამარჯვებული: {winner.name}")
